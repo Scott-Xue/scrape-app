@@ -1,21 +1,28 @@
 import os
 import pandas as pd
-from youtube_api import YouTubeDataAPI # this package, it has a different name on pip: https://github.com/SMAPPNYU/youtube-data-api
+from youtube_api import YouTubeDataAPI
 
 
+def add_urls_mongo(*args):
+    return
 
-def add_urls_mongo_from_yt_search(query_string, # q (list or str) – regex pattern to search using | for or, && for and, and - for not. IE boat|fishing is boat or fishing
-                                  max_results=100, **kwargs):
+
+def add_urls_mongo_from_yt_search(query_string,  # q (list or str) – regex pattern to search using | for or, && for and, and - for not. IE boat|fishing is boat or fishing
+                                  max_results=100, destination_func=add_urls_mongo,
+                                  **kwargs):
     yt = YouTubeDataAPI(os.environ.get('YOUTUBE_API_KEY'))
     res = yt.search(query_string, max_results=max_results, **kwargs)
     df = pd.DataFrame(res)
     search_results = list(df.video_id)
-    if isinstance(kwargs['source_string'], type(None)):
-        source_string = 'yt_search:' + query_string + '_' + name_from_config(kwargs)
-    else:
-        source_string = kwargs['source_string']
-    added = add_urls_mongo(search_results, verbose=True, source=source_string)
+    source_string = ""
+    if kwargs:
+        if isinstance(kwargs['source_string'], type(None)):
+            source_string = 'yt_search:' + query_string + '_' + name_from_config(kwargs)
+        else:
+            source_string = kwargs['source_string']
+    added = destination_func(search_results, verbose=True, source=source_string)
     return added, search_results
+
 
 def add_urls_mongo_fom_recommended_videos(url, max_results=10, source='reco'):
     yt = YouTubeDataAPI(os.environ.get('YOUTUBE_API_KEY'))
@@ -51,7 +58,7 @@ def snowball_search(query_string, # q (list or str) – regex pattern to search 
 '''
 # add_url_mongo will be the main interface with the rest of the infrastructure.
 # It won't run without the rest of the repo, but you can see the code to get a sense of it
-def add_urls_mongo(url_list,
+"""def add_urls_mongo(url_list,
                    chunk_size=50,
                    max_comments=500,
                    update_links=False,
@@ -101,7 +108,7 @@ def add_urls_mongo(url_list,
             add_comments(url, mdb, max_results=max_comments)
     if update_links:
         update_comments_link()
-    return (url_list)
+    return (url_list)"""
 
 
 
