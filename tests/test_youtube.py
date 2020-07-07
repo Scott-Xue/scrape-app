@@ -12,14 +12,18 @@ def test_search():
 
 
 def test_recommended():
-    assert True
+    uri = 'Fue_oeI45CA'
+    added, urls_to_add = add_urls_mongo_fom_recommended_videos(uri, destination_func=add_urls_list)
+    assert len(added) <= len(urls_to_add)
+    for id in urls_to_add:
+        assert len(id) == 11
 
 
 def test_snowball():
     assert True
 
 
-def add_urls_list(search_results, verbose, source):
+def add_urls_list(search_results, verbose, source, **kwargs):
     """
     Fake function that mocks add_urls_mongo
     rtype: list
