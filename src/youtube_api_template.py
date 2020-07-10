@@ -11,7 +11,7 @@ def add_urls_list(search_results, verbose, source, **kwargs):
     return list(set(search_results))
 
 
-def add_urls_mongo_from_yt_search(query_string,  # q (list or str) – regex pattern to search using | for or, && for and, and - for not. IE boat|fishing is boat or fishing
+def add_urls_from_yt_search(query_string,  # q (list or str) – regex pattern to search using | for or, && for and, and - for not. IE boat|fishing is boat or fishing
                                   max_results=100, destination_func=add_urls_list,
                                   return_df=False,
                                   **kwargs):
@@ -29,7 +29,7 @@ def add_urls_mongo_from_yt_search(query_string,  # q (list or str) – regex pat
     return added, search_results
 
 
-def add_urls_mongo_fom_recommended_videos(url, max_results=10, return_df=False,
+def add_urls_fom_recommended_videos(url, max_results=10, return_df=False,
                                           source='reco', destination_func=add_urls_list):
     yt = YouTubeDataAPI(os.environ.get('YOUTUBE_API_KEY'))
     res = yt.get_recommended_videos(url, max_results=max_results)
@@ -42,14 +42,14 @@ def add_urls_mongo_fom_recommended_videos(url, max_results=10, return_df=False,
 
 
 def snowball_search(query_string,  # q (list or str) – regex pattern to search using | for or, && for and, and - for not. IE boat|fishing is boat or fishing
-                    max_results=100, n_recos=5, reco_depth=1, return_df=False, **kwargs):  # max_results,
+                    max_results=10, n_recos=5, reco_depth=1, return_df=False, **kwargs):  # max_results,
     source_string = 'snowball_search:' + name_from_config(kwargs)
     if not return_df:
-        added, search_results = add_urls_mongo_from_yt_search(query_string, max_results=max_results,
+        added, search_results = add_urls_from_yt_search(query_string, max_results=max_results,
                                                             source_string=source_string,
                                                             return_df=return_df, **kwargs)
     else:
-        df, added, search_results = add_urls_mongo_from_yt_search(query_string, max_results=max_results,
+        df, added, search_results = add_urls_from_yt_search(query_string, max_results=max_results,
                                                             source_string=source_string,
                                                             return_df=return_df, **kwargs)
     while reco_depth > 0:
@@ -58,10 +58,10 @@ def snowball_search(query_string,  # q (list or str) – regex pattern to search
         new_added = []
         for url in added:
             if not return_df:
-                recos, search_results = add_urls_mongo_fom_recommended_videos(url, max_results=n_recos,
+                recos, search_results = add_urls_fom_recommended_videos(url, max_results=n_recos,
                                                                               return_df=return_df)
             else:
-                new_df, recos, search_results = add_urls_mongo_fom_recommended_videos(url, max_results=n_recos,
+                new_df, recos, search_results = add_urls_fom_recommended_videos(url, max_results=n_recos,
                                                                                       return_df=return_df)
                 df.append(new_df)
             new_added.extend(recos)

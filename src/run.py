@@ -2,6 +2,7 @@ import youtube_api_template as yat
 import sys
 import os
 import time
+import argparse
 
 
 def print_metrics(res):
@@ -24,9 +25,9 @@ if __name__ == "__main__":
         print("Please input a valid method")
     else:
         if args[1] == 'search':
-            res = yat.add_urls_mongo_from_yt_search(args[2], return_df=True)
+            res = yat.add_urls_from_yt_search(args[2], return_df=True)
         elif args[1] == 'recommended':
-            res = yat.add_urls_mongo_fom_recommended_videos(args[2], return_df=True)
+            res = yat.add_urls_fom_recommended_videos(args[2], return_df=True)
         else:
             res = yat.snowball_search(args[2])
         if not os.path.isdir("logs"):
